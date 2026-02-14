@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bill Splitter</title>
+    <style>
+        :root {
+            --primary: #000000;
+            --accent: #2563eb;
+            --bg: #f5f5f7;
+            --card: #ffffff;
+            --text: #1d1d1f;
+            --text-secondary: #86868b;
+            --border: #d2d2d7;
+            --success: #34c759;
+            --error: #ff3b30;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 440px;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            padding: 32px 24px;
+            margin-top: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        p.subtitle {
+            margin: 6px 0 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .field-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 17px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fafafa;
+            color: var(--text);
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+        .col { flex: 1; }
+
+        .section-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 24px 0 12px;
+            padding-top: 16px;
+            border-top: 1px solid #ebECf0;
+        }
+
+        .section-label span {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .badge {
+            font-size: 11px;
+            background: #eef2ff;
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: transform 0.1s active;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        #results {
+            display: none;
+            margin-top: 32px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .total-display {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .total-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; }
+        .total-amount { font-size: 32px; font-weight: 800; color: var(--text); letter-spacing: -1px; margin-top: 4px; }
+
+        .result-card {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-info div:first-child { font-weight: 600; font-size: 15px; }
+        .result-info div:last-child { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .result-value { font-weight: 700; font-size: 17px; }
+
+        .share-btn {
+            background: var(--success);
+            margin-top: 24px;
+        }
+
+        .error-msg {
+            color: var(--error);
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 16px;
+            font-weight: 500;
+            display: none;
+            background: #fff5f5;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        #copyToast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header>
+        <h1>Split</h1>
+        <p class="subtitle">Fair share calculator</p>
+    </header>
+
+    <div id="errorBox" class="error-msg"></div>
+
+    <div class="input-group">
+        <label>Total Bill Amount</label>
+        <div class="field-wrapper">
+            <input type="number" id="totalBill" placeholder="0.00" step="0.01" inputmode="decimal">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Total People</label>
+        <input type="number" id="totalPeople" value="5" inputmode="numeric">
+    </div>
+
+    <div class="section-label">
+        <span>Group A</span>
+        <span class="badge">15% Extra</span>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label>People</label>
+            <input type="number" id="count1" value="1" inputmode="numeric">
+        </div>
+        <div class="col">
+            <label>Extra %</label>
+            <input type="number" id="percent1" value="15" step="0.1" inputmode="decimal">
+        </div>
+    </div>
+
+    <div class="section-label">
+        <span>Group B</span>
+        <span class="badge">12% Extra</span>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label>People</label>
+            <input type="number" id="count2" value="3" inputmode="numeric">
+        </div>
+        <div class="col">
+            <label>Extra %</label>
+            <input type="number" id="percent2" value="12" step="0.1" inputmode="decimal">
+        </div>
+    </div>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div id="results">
+        <div class="total-display">
+            <div class="total-label">Total Bill</div>
+            <div class="total-amount" id="resTotal">0.00</div>
+        </div>
+
+        <div id="resultList"></div>
+
+        <button class="share-btn" onclick="copyResult()">Copy Summary</button>
+    </div>
+</div>
+
+<div id="copyToast">Copied to clipboard!</div>
+
+<script>
+    let clipboardText = "";
+
+    function formatMoney(num) {
+        return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function calculate() {
+        const total = parseFloat(document.getElementById('totalBill').value);
+        const people = parseInt(document.getElementById('totalPeople').value);
+        
+        const c1 = parseInt(document.getElementById('count1').value) || 0;
+        const p1 = parseFloat(document.getElementById('percent1').value) || 0;
+        
+        const c2 = parseInt(document.getElementById('count2').value) || 0;
+        const p2 = parseFloat(document.getElementById('percent2').value) || 0;
+
+        const errorBox = document.getElementById('errorBox');
+        const results = document.getElementById('results');
+        const resultList = document.getElementById('resultList');
+
+        // Reset
+        errorBox.style.display = 'none';
+        resultList.innerHTML = '';
+
+        // Validation
+        if (isNaN(total) || total <= 0) {
+            showError("Please enter a valid bill amount.");
+            return;
+        }
+
+        // Calculation: Extras First
+        const extra1 = total * (p1 / 100);
+        const extra2 = total * (p2 / 100);
+        const totalExtras = (extra1 * c1) + (extra2 * c2);
+        const remaining = total - totalExtras;
+
+        if (remaining < 0) {
+            showError("Extras exceed the total bill amount.");
+            return;
+        }
+
+        const baseShare = remaining / people;
+        const countNormal = people - (c1 + c2);
+
+        if (countNormal < 0) {
+            showError("Group counts exceed total people.");
+            return;
+        }
+
+        // Final Values
+        const pay1 = baseShare + extra1;
+        const pay2 = baseShare + extra2;
+
+        // Render Results
+        results.style.display = 'block';
+        document.getElementById('resTotal').innerText = formatMoney(total);
+
+        clipboardText = `🧾 Bill Split\nTotal: ${formatMoney(total)}\n\n`;
+
+        if (c1 > 0) {
+            addResultItem(`Group A (${c1})`, pay1, `Base + ${p1}% Extra`);
+            clipboardText += `Group A (${p1}%): ${formatMoney(pay1)} ea\n`;
+        }
+        if (c2 > 0) {
+            addResultItem(`Group B (${c2})`, pay2, `Base + ${p2}% Extra`);
+            clipboardText += `Group B (${p2}%): ${formatMoney(pay2)} ea\n`;
+        }
+        if (countNormal > 0) {
+            addResultItem(`Standard (${countNormal})`, baseShare, `Base share only`);
+            clipboardText += `Standard: ${formatMoney(baseShare)} ea\n`;
+        }
+    }
+
+    function addResultItem(title, amount, desc) {
+        const div = document.createElement('div');
+        div.className = 'result-card';
+        div.innerHTML = `
+            <div class="result-info">
+                <div>${title}</div>
+                <div>${desc}</div>
+            </div>
+            <div class="result-value">${formatMoney(amount)}</div>
+        `;
+        document.getElementById('resultList').appendChild(div);
+    }
+
+    function showError(msg) {
+        const box = document.getElementById('errorBox');
+        box.innerText = msg;
+        box.style.display = 'block';
+        document.getElementById('results').style.display = 'none';
+    }
+
+    function copyResult() {
+        const el = document.createElement('textarea');
+        el.value = clipboardText;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        
+        const toast = document.getElementById('copyToast');
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 2000);
+    }
+</script>
+
+</body>
+</html>
