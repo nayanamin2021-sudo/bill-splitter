@@ -1,555 +1,417 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Power Splitter</title>
-    <style>
-        :root {
-            --primary: #000000;
-            --accent: #2563eb;
-            --bg: #f5f5f7;
-            --card: #ffffff;
-            --text: #1d1d1f;
-            --text-secondary: #86868b;
-            --border: #d2d2d7;
-            --success: #34c759;
-            --danger-text: #ef4444;
-            --danger-bg: #fee2e2;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Power Splitter</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-2: #f3f5fa;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --primary: #1d4ed8;
+      --primary-2: #1e40af;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --success: #047857;
+      --success-bg: #ecfdf5;
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      display: grid;
+      place-items: start center;
+      padding: 24px;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
+    .app {
+      width: min(760px, 100%);
+      background: var(--surface);
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
 
-        .app {
-            width: 100%;
-            max-width: 500px;
-            background: var(--card);
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            padding: 32px 24px;
-            margin-top: 20px;
-        }
+    h1 { margin: 0; font-size: 1.5rem; }
+    .sub { margin: 6px 0 0; color: var(--muted); font-size: .95rem; }
 
-        header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
+    .grid { display: grid; gap: 14px; }
+    .grid.cols-2 { grid-template-columns: 2fr 1fr; }
 
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: -0.5px;
-        }
+    label { font-size: .8rem; color: var(--muted); font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+    .field { display: grid; gap: 7px; }
 
-        p.subtitle {
-            margin: 6px 0 0;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
+    input, button {
+      font: inherit;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 11px 12px;
+      background: #fff;
+      color: var(--text);
+    }
 
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
+    input:focus-visible, button:focus-visible {
+      outline: 3px solid rgba(29, 78, 216, .25);
+      outline-offset: 1px;
+      border-color: var(--primary);
+    }
 
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            font-size: 16px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #fafafa;
-            color: var(--text);
-            transition: all 0.2s ease;
-            -webkit-appearance: none;
-        }
+    .section { margin-top: 20px; }
+    .section h2 { font-size: 1rem; margin: 0 0 10px; }
 
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-        }
+    .group-list { display: grid; gap: 10px; }
+    .group {
+      border: 1px solid #e5e7eb;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .group-head { display: flex; align-items: center; justify-content: space-between; }
+    .group-grid { display: grid; gap: 10px; grid-template-columns: 2fr 1fr 1fr; }
 
-        /* Group Rows */
-        .group-row {
-            background: #f9f9fa;
-            border: 1px solid #ebECf0;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            position: relative;
-            animation: slideDown 0.3s ease-out;
-        }
+    .btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .btn.primary:hover { background: var(--primary-2); border-color: var(--primary-2); }
+    .btn.ghost:hover { border-color: var(--primary); color: var(--primary); }
+    .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .stack { display: grid; gap: 10px; }
+    .error {
+      display: none;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #fecaca;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
 
-        .group-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
+    .remainder {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius);
+      padding: 12px;
+    }
 
-        .delete-btn {
-            background: transparent;
-            color: var(--text-secondary);
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 4px;
-        }
-        .delete-btn:hover { color: var(--danger-text); }
+    .results {
+      display: none;
+      margin-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 18px;
+    }
 
-        .group-inputs {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .mini-label {
-            font-size: 10px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-            font-weight: 600;
-        }
+    .total { font-size: 1.7rem; font-weight: 800; margin-bottom: 10px; }
+    .result-item {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
 
-        .add-btn {
-            background: transparent;
-            border: 2px dashed #d2d2d7;
-            color: var(--text-secondary);
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 24px;
-            transition: all 0.2s;
-        }
-        .add-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: #f0f7ff;
-        }
+    .toast {
+      position: fixed;
+      inset-inline: 0;
+      bottom: 24px;
+      margin-inline: auto;
+      width: fit-content;
+      background: #111827;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 999px;
+      display: none;
+    }
 
-        /* Remainder Section */
-        .remainder-box {
-            background: #eefdf2;
-            border: 1px solid #bbf7d0;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 24px;
-        }
-
-        .remainder-header {
-            font-size: 12px;
-            font-weight: 600;
-            color: #166534;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        /* Calculate Button */
-        .calc-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s active;
-        }
-        .calc-btn:active { transform: scale(0.98); }
-
-        /* Results */
-        #results {
-            display: none;
-            margin-top: 32px;
-            border-top: 1px solid var(--border);
-            padding-top: 24px;
-        }
-
-        .total-display {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .total-amount { font-size: 32px; font-weight: 800; color: var(--text); letter-spacing: -1px; }
-
-        .result-card {
-            background: #f5f5f7;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .result-info div:first-child { font-weight: 600; font-size: 15px; }
-        .result-info div:last-child { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
-        .result-value { font-weight: 700; font-size: 17px; }
-
-        .share-btn {
-            background: var(--success);
-            color: white;
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 16px;
-        }
-
-        .error-msg {
-            color: var(--danger-text);
-            background: var(--danger-bg);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 16px;
-            font-weight: 500;
-            display: none;
-        }
-
-        #copyToast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.85);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            display: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 100;
-        }
-    </style>
+    @media (max-width: 640px) {
+      .grid.cols-2, .group-grid { grid-template-columns: 1fr; }
+      body { padding: 10px; }
+      .app { padding: 14px; }
+    }
+  </style>
 </head>
 <body>
-
-<div class="app">
+  <main class="app" aria-label="Bill split calculator">
     <header>
-        <h1>Power Splitter</h1>
-        <p class="subtitle">Auto-saves your group settings</p>
+      <h1>Power Splitter</h1>
+      <p class="sub">Professional split calculator with weighted extras and persistent session data.</p>
     </header>
 
-    <div id="errorBox" class="error-msg"></div>
+    <section class="grid cols-2 section">
+      <div class="field">
+        <label for="totalBill">Total Bill</label>
+        <input id="totalBill" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" />
+      </div>
+      <div class="field">
+        <label for="totalPeople">Total People</label>
+        <input id="totalPeople" type="number" min="1" step="1" inputmode="numeric" value="5" />
+      </div>
+    </section>
 
-    <div style="display: flex; gap: 16px; margin-bottom: 24px;">
-        <div style="flex: 1;">
-            <label>Total Bill</label>
-            <input type="number" id="totalBill" placeholder="0.00" step="0.01" inputmode="decimal" onchange="saveData()">
-        </div>
-        <div style="width: 100px;">
-            <label>Total People</label>
-            <input type="number" id="totalPeople" value="5" inputmode="numeric" onchange="saveData()">
-        </div>
-    </div>
+    <section class="section stack">
+      <h2>Special Groups (Extra % per person)</h2>
+      <div id="groups" class="group-list"></div>
+      <button id="addGroup" class="btn ghost" type="button">+ Add Special Group</button>
+    </section>
 
-    <label>Special Groups (Extras)</label>
-    <div id="groupsContainer"></div>
+    <section class="section remainder">
+      <div class="field">
+        <label for="remainderName">Standard / Remainder Group Name</label>
+        <input id="remainderName" type="text" value="Standard Group" placeholder="e.g., Friends" />
+      </div>
+    </section>
 
-    <button class="add-btn" onclick="addNewGroup()">+ Add Special Group</button>
+    <div id="error" class="error" role="alert" aria-live="assertive"></div>
 
-    <!-- Remainder Name Section -->
-    <div class="remainder-box">
-        <div class="remainder-header">Standard / Remainder Group</div>
-        <input type="text" id="remainderName" value="Sahin" placeholder="e.g. Sahin & Iqbal" oninput="saveData()" style="background:white; border-color:#bbf7d0;">
-        <div style="font-size:10px; color:#166534; margin-top:6px;">Everyone NOT in a special group falls here automatically.</div>
-    </div>
+    <section class="section stack">
+      <button id="calculateBtn" class="btn primary" type="button">Calculate Split</button>
+    </section>
 
-    <button class="calc-btn" onclick="calculate()">Calculate Split</button>
+    <section id="results" class="results" aria-live="polite">
+      <div class="field">
+        <label>Total Bill</label>
+        <div id="totalOut" class="total">0.00</div>
+      </div>
+      <div id="resultItems"></div>
+      <button id="copyBtn" class="btn" type="button">Copy Summary</button>
+    </section>
+  </main>
 
-    <div id="results">
-        <div class="total-display">
-            <label>Total Bill</label>
-            <div class="total-amount" id="resTotal">0.00</div>
-        </div>
-        <div id="resultList"></div>
-        <button class="share-btn" onclick="copyResult()">Copy Summary</button>
-    </div>
-</div>
+  <div id="toast" class="toast">Copied to clipboard</div>
 
-<div id="copyToast">Copied to clipboard!</div>
-
-<script>
-    // --- Initial Defaults ---
-    const defaultGroups = [
-        { name: "Nayan", count: 1, percent: 15 },
-        { name: "Rubel, Iqbal, Shafayet", count: 3, percent: 12 }
+  <script>
+    const STORAGE_KEY = 'power_splitter_v3';
+    const DEFAULT_GROUPS = [
+      { name: 'VIP', count: 1, percent: 15 },
+      { name: 'Team A', count: 2, percent: 10 }
     ];
 
-    const container = document.getElementById('groupsContainer');
-    let clipboardText = "";
+    const el = {
+      totalBill: document.getElementById('totalBill'),
+      totalPeople: document.getElementById('totalPeople'),
+      remainderName: document.getElementById('remainderName'),
+      groups: document.getElementById('groups'),
+      addGroup: document.getElementById('addGroup'),
+      calculateBtn: document.getElementById('calculateBtn'),
+      error: document.getElementById('error'),
+      results: document.getElementById('results'),
+      totalOut: document.getElementById('totalOut'),
+      resultItems: document.getElementById('resultItems'),
+      copyBtn: document.getElementById('copyBtn'),
+      toast: document.getElementById('toast')
+    };
 
-    // --- Core Functions ---
+    let lastSummary = '';
 
-    function formatMoney(num) {
-        return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+    const money = (n) => round2(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function showError(message) {
+      el.error.textContent = message;
+      el.error.style.display = 'block';
+      el.results.style.display = 'none';
     }
 
-    function createGroupRow(name = "", count = 1, percent = 0) {
-        const div = document.createElement('div');
-        div.className = 'group-row';
-        div.innerHTML = `
-            <div class="group-header-row">
-                <div class="mini-label">GROUP DETAILS</div>
-                <button class="delete-btn" onclick="removeGroup(this)">✕</button>
-            </div>
-            <div class="group-inputs">
-                <div>
-                    <div class="mini-label">Name</div>
-                    <input type="text" class="g-name" placeholder="Name" value="${name}" oninput="saveData()">
-                </div>
-                <div>
-                    <div class="mini-label">People</div>
-                    <input type="number" class="g-count" placeholder="#" value="${count}" inputmode="numeric" oninput="saveData()">
-                </div>
-                <div>
-                    <div class="mini-label">Extra %</div>
-                    <input type="number" class="g-percent" placeholder="%" value="${percent}" inputmode="decimal" oninput="saveData()">
-                </div>
-            </div>
-        `;
-        container.appendChild(div);
-        saveData();
+    function clearError() {
+      el.error.textContent = '';
+      el.error.style.display = 'none';
     }
 
-    function addNewGroup() {
-        createGroupRow("", 1, 0);
+    function createGroupRow({ name = '', count = 1, percent = 0 } = {}) {
+      const row = document.createElement('article');
+      row.className = 'group';
+      row.innerHTML = `
+        <div class="group-head">
+          <strong>Group</strong>
+          <button class="btn danger remove" type="button" aria-label="Remove group">Remove</button>
+        </div>
+        <div class="group-grid">
+          <div class="field">
+            <label>Name</label>
+            <input class="g-name" type="text" value="${name}" placeholder="Group name" />
+          </div>
+          <div class="field">
+            <label>People</label>
+            <input class="g-count" type="number" min="0" step="1" value="${count}" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label>Extra %</label>
+            <input class="g-percent" type="number" min="0" max="100" step="0.01" value="${percent}" inputmode="decimal" />
+          </div>
+        </div>
+      `;
+
+      row.querySelector('.remove').addEventListener('click', () => {
+        row.remove();
+        saveState();
+      });
+
+      row.querySelectorAll('input').forEach((input) => input.addEventListener('input', saveState));
+      el.groups.appendChild(row);
     }
 
-    function removeGroup(btn) {
-        btn.closest('.group-row').remove();
-        saveData();
+    function getGroupData() {
+      return Array.from(el.groups.querySelectorAll('.group')).map((row) => ({
+        name: row.querySelector('.g-name').value.trim() || 'Unnamed Group',
+        count: Number.parseInt(row.querySelector('.g-count').value, 10) || 0,
+        percent: Number.parseFloat(row.querySelector('.g-percent').value) || 0
+      }));
     }
 
-    // --- Calculation Logic ---
+    function validateInputs(totalBill, totalPeople, groups) {
+      if (!Number.isFinite(totalBill) || totalBill <= 0) return 'Enter a valid total bill greater than 0.';
+      if (!Number.isInteger(totalPeople) || totalPeople <= 0) return 'Enter a valid total people count.';
+
+      let groupedPeople = 0;
+      for (const g of groups) {
+        if (g.count < 0) return `People count cannot be negative for ${g.name}.`;
+        if (g.percent < 0 || g.percent > 100) return `Extra % must be between 0 and 100 for ${g.name}.`;
+        groupedPeople += g.count;
+      }
+
+      if (groupedPeople > totalPeople) return `Grouped people (${groupedPeople}) exceed total people (${totalPeople}).`;
+      return null;
+    }
 
     function calculate() {
-        const totalBill = parseFloat(document.getElementById('totalBill').value);
-        const totalPeople = parseInt(document.getElementById('totalPeople').value);
-        const remainderName = document.getElementById('remainderName').value || "Standard Share";
-        
-        const errorBox = document.getElementById('errorBox');
-        const results = document.getElementById('results');
-        const resultList = document.getElementById('resultList');
+      clearError();
+      const totalBill = Number.parseFloat(el.totalBill.value);
+      const totalPeople = Number.parseInt(el.totalPeople.value, 10);
+      const remainderName = el.remainderName.value.trim() || 'Standard Group';
+      const groups = getGroupData();
 
-        errorBox.style.display = 'none';
-        resultList.innerHTML = '';
-        clipboardText = "";
+      const validationError = validateInputs(totalBill, totalPeople, groups);
+      if (validationError) return showError(validationError);
 
-        if (isNaN(totalBill) || totalBill <= 0) {
-            showError("Please enter a valid total bill.");
-            return;
-        }
-        if (isNaN(totalPeople) || totalPeople <= 0) {
-            showError("Please enter valid total people.");
-            return;
-        }
+      let totalExtras = 0;
+      let groupedPeople = 0;
 
-        const groupRows = document.querySelectorAll('.group-row');
-        let groupsData = [];
-        let totalExtrasMoney = 0;
-        let totalGroupPeople = 0;
-
-        // Process Groups
-        for (let row of groupRows) {
-            const name = row.querySelector('.g-name').value || "Unnamed Group";
-            const count = parseInt(row.querySelector('.g-count').value) || 0;
-            const percent = parseFloat(row.querySelector('.g-percent').value) || 0;
-
-            if (count > 0) {
-                // Logic: "15% Extra" means 15% of the TOTAL BILL is added to the pot for this group
-                // Note: If multiple people are in the group, the prompt implies they EACH pay the extra percentage?
-                // Let's stick to the confirmed logic from previous chats:
-                // "3 people pay 12% extra" -> They pay Base + (TotalBill * 12%)
-                
-                const extraPerPerson = totalBill * (percent / 100);
-                const totalExtraForGroup = extraPerPerson * count;
-                
-                totalExtrasMoney += totalExtraForGroup;
-                totalGroupPeople += count;
-
-                groupsData.push({
-                    name: name,
-                    count: count,
-                    percent: percent,
-                    extraPerPerson: extraPerPerson
-                });
-            }
-        }
-
-        // Validate
-        const remainingMoney = totalBill - totalExtrasMoney;
-        if (remainingMoney < 0) {
-            showError(`Extras (${formatMoney(totalExtrasMoney)}) exceed the total bill!`);
-            return;
-        }
-
-        const normalPeopleCount = totalPeople - totalGroupPeople;
-        if (normalPeopleCount < 0) {
-            showError(`Group people (${totalGroupPeople}) exceed Total People (${totalPeople})!`);
-            return;
-        }
-
-        // Base Share Calculation
-        // Logic: Total Bill - All Extras = Remaining Amount
-        // Remaining Amount / Total People = Base Share
-        const baseShare = remainingMoney / totalPeople;
-
-        // Render Results
-        results.style.display = 'block';
-        document.getElementById('resTotal').innerText = formatMoney(totalBill);
-        
-        clipboardText = `🧾 *Bill Split*\nTotal: ${formatMoney(totalBill)}\n\n`;
-
-        // 1. Special Groups
-        groupsData.forEach(g => {
-            const finalPerPerson = baseShare + g.extraPerPerson;
-            addResultItem(
-                `${g.name} (${g.count})`, 
-                finalPerPerson, 
-                `Base + ${g.percent}% Extra`
-            );
-            clipboardText += `${g.name} (${g.percent}%): ${formatMoney(finalPerPerson)} ea\n`;
+      const computedGroups = groups
+        .filter((g) => g.count > 0)
+        .map((g) => {
+          const extraPerPerson = round2(totalBill * (g.percent / 100));
+          const groupExtraTotal = round2(extraPerPerson * g.count);
+          totalExtras = round2(totalExtras + groupExtraTotal);
+          groupedPeople += g.count;
+          return { ...g, extraPerPerson };
         });
 
-        // 2. Remainder Group
-        if (normalPeopleCount > 0) {
-            addResultItem(
-                `${remainderName} (${normalPeopleCount})`, 
-                baseShare, 
-                `Standard Share`
-            );
-            clipboardText += `${remainderName}: ${formatMoney(baseShare)} ea\n`;
-        }
-        
-        saveData(); // Save successful calculation state
+      const remaining = round2(totalBill - totalExtras);
+      if (remaining < 0) return showError(`Extras (${money(totalExtras)}) exceed total bill (${money(totalBill)}).`);
+
+      const baseShare = round2(remaining / totalPeople);
+      const remainderPeople = totalPeople - groupedPeople;
+
+      el.totalOut.textContent = money(totalBill);
+      el.resultItems.innerHTML = '';
+
+      let summary = `Bill Split\nTotal: ${money(totalBill)}\n\n`;
+
+      for (const g of computedGroups) {
+        const perPerson = round2(baseShare + g.extraPerPerson);
+        renderResult(`${g.name} (${g.count})`, perPerson, `Base + ${g.percent}%`);
+        summary += `${g.name} (${g.percent}%): ${money(perPerson)} each\n`;
+      }
+
+      if (remainderPeople > 0) {
+        renderResult(`${remainderName} (${remainderPeople})`, baseShare, 'Standard share');
+        summary += `${remainderName}: ${money(baseShare)} each\n`;
+      }
+
+      lastSummary = summary.trim();
+      el.results.style.display = 'block';
+      saveState();
     }
 
-    function addResultItem(title, amount, desc) {
-        const div = document.createElement('div');
-        div.className = 'result-card';
-        div.innerHTML = `
-            <div class="result-info">
-                <div>${title}</div>
-                <div>${desc}</div>
-            </div>
-            <div class="result-value">${formatMoney(amount)}</div>
-        `;
-        document.getElementById('resultList').appendChild(div);
+    function renderResult(title, amount, subtitle) {
+      const div = document.createElement('div');
+      div.className = 'result-item';
+      div.innerHTML = `
+        <div>
+          <div><strong>${title}</strong></div>
+          <div style="color: var(--muted); font-size: .9rem;">${subtitle}</div>
+        </div>
+        <div><strong>${money(amount)}</strong></div>
+      `;
+      el.resultItems.appendChild(div);
     }
 
-    function showError(msg) {
-        const box = document.getElementById('errorBox');
-        box.innerText = msg;
-        box.style.display = 'block';
-        document.getElementById('results').style.display = 'none';
-    }
-
-    function copyResult() {
-        const el = document.createElement('textarea');
-        el.value = clipboardText;
-        document.body.appendChild(el);
-        el.select();
+    async function copySummary() {
+      if (!lastSummary) return;
+      try {
+        await navigator.clipboard.writeText(lastSummary);
+      } catch {
+        const t = document.createElement('textarea');
+        t.value = lastSummary;
+        document.body.appendChild(t);
+        t.select();
         document.execCommand('copy');
-        document.body.removeChild(el);
-        
-        const toast = document.getElementById('copyToast');
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 2000);
+        t.remove();
+      }
+      el.toast.style.display = 'block';
+      setTimeout(() => { el.toast.style.display = 'none'; }, 1800);
     }
 
-    // --- LocalStorage Auto-Save Logic ---
-
-    function saveData() {
-        const totalPeople = document.getElementById('totalPeople').value;
-        const remainderName = document.getElementById('remainderName').value;
-        
-        const groupRows = document.querySelectorAll('.group-row');
-        const groups = [];
-        groupRows.forEach(row => {
-            groups.push({
-                name: row.querySelector('.g-name').value,
-                count: row.querySelector('.g-count').value,
-                percent: row.querySelector('.g-percent').value
-            });
-        });
-
-        const data = {
-            totalPeople,
-            remainderName,
-            groups
-        };
-
-        localStorage.setItem('billSplitData_v2', JSON.stringify(data));
+    function saveState() {
+      const state = {
+        totalBill: el.totalBill.value,
+        totalPeople: el.totalPeople.value,
+        remainderName: el.remainderName.value,
+        groups: getGroupData()
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    function loadData() {
-        const saved = localStorage.getItem('billSplitData_v2');
-        if (saved) {
-            try {
-                const data = JSON.parse(saved);
-                document.getElementById('totalPeople').value = data.totalPeople || 5;
-                document.getElementById('remainderName').value = data.remainderName || "Sahin";
-                
-                container.innerHTML = ''; // Clear defaults
-                if (data.groups && data.groups.length > 0) {
-                    data.groups.forEach(g => createGroupRow(g.name, g.count, g.percent));
-                } else {
-                    // Fallback if empty groups saved
-                    defaultGroups.forEach(g => createGroupRow(g.name, g.count, g.percent));
-                }
-            } catch (e) {
-                console.error("Save data corrupted, loading defaults");
-                loadDefaults();
-            }
-        } else {
-            loadDefaults();
-        }
+    function restoreState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        DEFAULT_GROUPS.forEach(createGroupRow);
+        return;
+      }
+      try {
+        const data = JSON.parse(raw);
+        el.totalBill.value = data.totalBill || '';
+        el.totalPeople.value = data.totalPeople || '5';
+        el.remainderName.value = data.remainderName || 'Standard Group';
+        (Array.isArray(data.groups) && data.groups.length ? data.groups : DEFAULT_GROUPS).forEach(createGroupRow);
+      } catch {
+        DEFAULT_GROUPS.forEach(createGroupRow);
+      }
     }
 
-    function loadDefaults() {
-        container.innerHTML = '';
-        defaultGroups.forEach(g => createGroupRow(g.name, g.count, g.percent));
-    }
+    el.addGroup.addEventListener('click', () => createGroupRow());
+    el.calculateBtn.addEventListener('click', calculate);
+    el.copyBtn.addEventListener('click', copySummary);
+    [el.totalBill, el.totalPeople, el.remainderName].forEach((i) => i.addEventListener('input', saveState));
 
-    // Init
-    window.addEventListener('DOMContentLoaded', loadData);
-
-</script>
-
+    restoreState();
+  </script>
 </body>
 </html>
