@@ -269,7 +269,7 @@
     <div style="display: flex; gap: 16px; margin-bottom: 24px;">
         <div style="flex: 1;">
             <label>Total Bill</label>
-            <input type="number" id="totalBill" placeholder="0.00" step="0.01" inputmode="decimal" onchange="saveData()">
+            <input type="number" id="totalBill" placeholder="0.00" step="0.01" min="0" inputmode="decimal" onchange="saveData()">
         </div>
         <div style="width: 100px;">
             <label>Total People</label>
@@ -315,8 +315,12 @@
 
     // --- Core Functions ---
 
+    function round2(num) {
+        return Math.round((num + Number.EPSILON) * 100) / 100;
+    }
+
     function formatMoney(num) {
-        return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return round2(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function createGroupRow(name = "", count = 1, percent = 0) {
@@ -334,11 +338,11 @@
                 </div>
                 <div>
                     <div class="mini-label">People</div>
-                    <input type="number" class="g-count" placeholder="#" value="${count}" inputmode="numeric" oninput="saveData()">
+                    <input type="number" class="g-count" placeholder="#" value="${count}" min="0" step="1" inputmode="numeric" oninput="saveData()">
                 </div>
                 <div>
                     <div class="mini-label">Extra %</div>
-                    <input type="number" class="g-percent" placeholder="%" value="${percent}" inputmode="decimal" oninput="saveData()">
+                    <input type="number" class="g-percent" placeholder="%" value="${percent}" min="0" max="100" step="0.01" inputmode="decimal" oninput="saveData()">
                 </div>
             </div>
         `;
@@ -390,13 +394,15 @@
             const count = parseInt(row.querySelector('.g-count').value) || 0;
             const percent = parseFloat(row.querySelector('.g-percent').value) || 0;
 
+            if (percent < 0 || percent > 100) {
+                showError(`Extra % for ${name} must be between 0 and 100.`);
+                return;
+            }
+
             if (count > 0) {
-                // Logic: "15% Extra" means 15% of the TOTAL BILL is added to the pot for this group
-                // Note: If multiple people are in the group, the prompt implies they EACH pay the extra percentage?
-                // Let's stick to the confirmed logic from previous chats:
-                // "3 people pay 12% extra" -> They pay Base + (TotalBill * 12%)
-                
-                const extraPerPerson = totalBill * (percent / 100);
+                // Rule: each person in a special group pays
+                // baseShare + (totalBill * extra%).
+                const extraPerPerson = round2(totalBill * (percent / 100));
                 const totalExtraForGroup = extraPerPerson * count;
                 
                 totalExtrasMoney += totalExtraForGroup;
@@ -479,14 +485,18 @@
         document.getElementById('results').style.display = 'none';
     }
 
-    function copyResult() {
-        const el = document.createElement('textarea');
-        el.value = clipboardText;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        
+    async function copyResult() {
+        try {
+            await navigator.clipboard.writeText(clipboardText);
+        } catch (err) {
+            const el = document.createElement('textarea');
+            el.value = clipboardText;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        }
+
         const toast = document.getElementById('copyToast');
         toast.style.display = 'block';
         setTimeout(() => toast.style.display = 'none', 2000);
@@ -495,6 +505,7 @@
     // --- LocalStorage Auto-Save Logic ---
 
     function saveData() {
+        const totalBill = document.getElementById('totalBill').value;
         const totalPeople = document.getElementById('totalPeople').value;
         const remainderName = document.getElementById('remainderName').value;
         
@@ -509,6 +520,7 @@
         });
 
         const data = {
+            totalBill,
             totalPeople,
             remainderName,
             groups
@@ -522,6 +534,7 @@
         if (saved) {
             try {
                 const data = JSON.parse(saved);
+                document.getElementById('totalBill').value = data.totalBill || "";
                 document.getElementById('totalPeople').value = data.totalPeople || 5;
                 document.getElementById('remainderName').value = data.remainderName || "Sahin";
                 
