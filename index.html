@@ -1,3 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Power Splitter</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-2: #f3f5fa;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --primary: #1d4ed8;
+      --primary-2: #1e40af;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --success: #047857;
+      --success-bg: #ecfdf5;
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      display: grid;
+      place-items: start center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(760px, 100%);
+      background: var(--surface);
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    h1 { margin: 0; font-size: 1.5rem; }
+    .sub { margin: 6px 0 0; color: var(--muted); font-size: .95rem; }
+
+    .grid { display: grid; gap: 14px; }
+    .grid.cols-2 { grid-template-columns: 2fr 1fr; }
+
+    label { font-size: .8rem; color: var(--muted); font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+    .field { display: grid; gap: 7px; }
+
+    input, button {
+      font: inherit;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 11px 12px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus-visible, button:focus-visible {
+      outline: 3px solid rgba(29, 78, 216, .25);
+      outline-offset: 1px;
+      border-color: var(--primary);
+    }
+
+    .section { margin-top: 20px; }
+    .section h2 { font-size: 1rem; margin: 0 0 10px; }
+
+    .group-list { display: grid; gap: 10px; }
+    .group {
+      border: 1px solid #e5e7eb;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .group-head { display: flex; align-items: center; justify-content: space-between; }
+    .group-grid { display: grid; gap: 10px; grid-template-columns: 2fr 1fr 1fr; }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .btn.primary:hover { background: var(--primary-2); border-color: var(--primary-2); }
+    .btn.ghost:hover { border-color: var(--primary); color: var(--primary); }
+    .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+    .stack { display: grid; gap: 10px; }
+    .error {
+      display: none;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #fecaca;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .remainder {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius);
+      padding: 12px;
+    }
+
+    .results {
+      display: none;
+      margin-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 18px;
+    }
+
+    .total { font-size: 1.7rem; font-weight: 800; margin-bottom: 10px; }
+    .result-item {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .toast {
+      position: fixed;
+      inset-inline: 0;
+      bottom: 24px;
+      margin-inline: auto;
+      width: fit-content;
+      background: #111827;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 999px;
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      .grid.cols-2, .group-grid { grid-template-columns: 1fr; }
+      body { padding: 10px; }
+      .app { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" aria-label="Bill split calculator">
+    <header>
+      <h1>Power Splitter</h1>
+      <p class="sub">Professional split calculator with weighted extras and persistent session data.</p>
+    </header>
+
+    <section class="grid cols-2 section">
+      <div class="field">
+        <label for="totalBill">Total Bill</label>
+        <input id="totalBill" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" />
+      </div>
+      <div class="field">
+        <label for="totalPeople">Total People</label>
+        <input id="totalPeople" type="number" min="1" step="1" inputmode="numeric" value="5" />
+      </div>
+    </section>
+
+    <section class="section stack">
+      <h2>Special Groups (Extra % per person)</h2>
+      <div id="groups" class="group-list"></div>
+      <button id="addGroup" class="btn ghost" type="button">+ Add Special Group</button>
+    </section>
+
+    <section class="section remainder">
+      <div class="field">
+        <label for="remainderName">Standard / Remainder Group Name</label>
+        <input id="remainderName" type="text" value="Standard Group" placeholder="e.g., Friends" />
+      </div>
+    </section>
+
+    <div id="error" class="error" role="alert" aria-live="assertive"></div>
+
+    <section class="section stack">
+      <button id="calculateBtn" class="btn primary" type="button">Calculate Split</button>
+    </section>
+
+    <section id="results" class="results" aria-live="polite">
+      <div class="field">
+        <label>Total Bill</label>
+        <div id="totalOut" class="total">0.00</div>
+      </div>
+      <div id="resultItems"></div>
+      <button id="copyBtn" class="btn" type="button">Copy Summary</button>
+    </section>
+  </main>
+
+  <div id="toast" class="toast">Copied to clipboard</div>
+
+  <script>
+    const STORAGE_KEY = 'power_splitter_v3';
+    const DEFAULT_GROUPS = [
+      { name: 'VIP', count: 1, percent: 15 },
+      { name: 'Team A', count: 2, percent: 10 }
+    ];
+
+    const el = {
+      totalBill: document.getElementById('totalBill'),
+      totalPeople: document.getElementById('totalPeople'),
+      remainderName: document.getElementById('remainderName'),
+      groups: document.getElementById('groups'),
+      addGroup: document.getElementById('addGroup'),
+      calculateBtn: document.getElementById('calculateBtn'),
+      error: document.getElementById('error'),
+      results: document.getElementById('results'),
+      totalOut: document.getElementById('totalOut'),
+      resultItems: document.getElementById('resultItems'),
+      copyBtn: document.getElementById('copyBtn'),
+      toast: document.getElementById('toast')
+    };
+
+    let lastSummary = '';
+
+    const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+    const money = (n) => round2(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function showError(message) {
+      el.error.textContent = message;
+      el.error.style.display = 'block';
+      el.results.style.display = 'none';
+    }
+
+    function clearError() {
+      el.error.textContent = '';
+      el.error.style.display = 'none';
+    }
+
+    function createGroupRow({ name = '', count = 1, percent = 0 } = {}) {
+      const row = document.createElement('article');
+      row.className = 'group';
+      row.innerHTML = `
+        <div class="group-head">
+          <strong>Group</strong>
+          <button class="btn danger remove" type="button" aria-label="Remove group">Remove</button>
+        </div>
+        <div class="group-grid">
+          <div class="field">
+            <label>Name</label>
+            <input class="g-name" type="text" value="${name}" placeholder="Group name" />
+          </div>
+          <div class="field">
+            <label>People</label>
+            <input class="g-count" type="number" min="0" step="1" value="${count}" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label>Extra %</label>
+            <input class="g-percent" type="number" min="0" max="100" step="0.01" value="${percent}" inputmode="decimal" />
+          </div>
+        </div>
+      `;
+
+      row.querySelector('.remove').addEventListener('click', () => {
+        row.remove();
+        saveState();
+      });
+
+      row.querySelectorAll('input').forEach((input) => input.addEventListener('input', saveState));
+      el.groups.appendChild(row);
+    }
+
+    function getGroupData() {
+      return Array.from(el.groups.querySelectorAll('.group')).map((row) => ({
+        name: row.querySelector('.g-name').value.trim() || 'Unnamed Group',
+        count: Number.parseInt(row.querySelector('.g-count').value, 10) || 0,
+        percent: Number.parseFloat(row.querySelector('.g-percent').value) || 0
+      }));
+    }
+
+    function validateInputs(totalBill, totalPeople, groups) {
+      if (!Number.isFinite(totalBill) || totalBill <= 0) return 'Enter a valid total bill greater than 0.';
+      if (!Number.isInteger(totalPeople) || totalPeople <= 0) return 'Enter a valid total people count.';
+
+      let groupedPeople = 0;
+      for (const g of groups) {
+        if (g.count < 0) return `People count cannot be negative for ${g.name}.`;
+        if (g.percent < 0 || g.percent > 100) return `Extra % must be between 0 and 100 for ${g.name}.`;
+        groupedPeople += g.count;
+      }
+
+      if (groupedPeople > totalPeople) return `Grouped people (${groupedPeople}) exceed total people (${totalPeople}).`;
+      return null;
+    }
+
+    function calculate() {
+      clearError();
+      const totalBill = Number.parseFloat(el.totalBill.value);
+      const totalPeople = Number.parseInt(el.totalPeople.value, 10);
+      const remainderName = el.remainderName.value.trim() || 'Standard Group';
+      const groups = getGroupData();
+
+      const validationError = validateInputs(totalBill, totalPeople, groups);
+      if (validationError) return showError(validationError);
+
+      let totalExtras = 0;
+      let groupedPeople = 0;
+
+      const computedGroups = groups
+        .filter((g) => g.count > 0)
+        .map((g) => {
+          const extraPerPerson = round2(totalBill * (g.percent / 100));
+          const groupExtraTotal = round2(extraPerPerson * g.count);
+          totalExtras = round2(totalExtras + groupExtraTotal);
+          groupedPeople += g.count;
+          return { ...g, extraPerPerson };
+        });
+
+      const remaining = round2(totalBill - totalExtras);
+      if (remaining < 0) return showError(`Extras (${money(totalExtras)}) exceed total bill (${money(totalBill)}).`);
+
+      const baseShare = round2(remaining / totalPeople);
+      const remainderPeople = totalPeople - groupedPeople;
+
+      el.totalOut.textContent = money(totalBill);
+      el.resultItems.innerHTML = '';
+
+      let summary = `Bill Split\nTotal: ${money(totalBill)}\n\n`;
+
+      for (const g of computedGroups) {
+        const perPerson = round2(baseShare + g.extraPerPerson);
+        renderResult(`${g.name} (${g.count})`, perPerson, `Base + ${g.percent}%`);
+        summary += `${g.name} (${g.percent}%): ${money(perPerson)} each\n`;
+      }
+
+      if (remainderPeople > 0) {
+        renderResult(`${remainderName} (${remainderPeople})`, baseShare, 'Standard share');
+        summary += `${remainderName}: ${money(baseShare)} each\n`;
+      }
+
+      lastSummary = summary.trim();
+      el.results.style.display = 'block';
+      saveState();
+    }
+
+    function renderResult(title, amount, subtitle) {
+      const div = document.createElement('div');
+      div.className = 'result-item';
+      div.innerHTML = `
+        <div>
+          <div><strong>${title}</strong></div>
+          <div style="color: var(--muted); font-size: .9rem;">${subtitle}</div>
+        </div>
+        <div><strong>${money(amount)}</strong></div>
+      `;
+      el.resultItems.appendChild(div);
+    }
+
+    async function copySummary() {
+      if (!lastSummary) return;
+      try {
+        await navigator.clipboard.writeText(lastSummary);
+      } catch {
+        const t = document.createElement('textarea');
+        t.value = lastSummary;
+        document.body.appendChild(t);
+        t.select();
+        document.execCommand('copy');
+        t.remove();
+      }
+      el.toast.style.display = 'block';
+      setTimeout(() => { el.toast.style.display = 'none'; }, 1800);
+    }
+
+    function saveState() {
+      const state = {
+        totalBill: el.totalBill.value,
+        totalPeople: el.totalPeople.value,
+        remainderName: el.remainderName.value,
+        groups: getGroupData()
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function restoreState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        DEFAULT_GROUPS.forEach(createGroupRow);
+        return;
+      }
+      try {
+        const data = JSON.parse(raw);
+        el.totalBill.value = data.totalBill || '';
+        el.totalPeople.value = data.totalPeople || '5';
+        el.remainderName.value = data.remainderName || 'Standard Group';
+        (Array.isArray(data.groups) && data.groups.length ? data.groups : DEFAULT_GROUPS).forEach(createGroupRow);
+      } catch {
+        DEFAULT_GROUPS.forEach(createGroupRow);
+      }
+    }
+
+    el.addGroup.addEventListener('click', () => createGroupRow());
+    el.calculateBtn.addEventListener('click', calculate);
+    el.copyBtn.addEventListener('click', copySummary);
+    [el.totalBill, el.totalPeople, el.remainderName].forEach((i) => i.addEventListener('input', saveState));
+
+    restoreState();
+  </script>
+=======
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -563,6 +979,7 @@
     window.addEventListener('DOMContentLoaded', loadData);
 
 </script>
+
 
 </body>
 </html>
