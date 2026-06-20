@@ -2,337 +2,445 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
   <title>Power Splitter</title>
   <style>
     :root {
-      color-scheme: light;
-      --bg: #f5f5f7;
-      --card: #ffffff;
-      --card-muted: #f8fafc;
-      --text: #111827;
-      --muted: #6b7280;
-      --border: #d1d5db;
-      --border-soft: #e5e7eb;
-      --primary: #111827;
-      --primary-hover: #000000;
+      color-scheme: light dark;
+      --bg: #eef2ff;
+      --bg-2: #f8fafc;
+      --card: rgba(255, 255, 255, 0.92);
+      --card-solid: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #dbe3f0;
+      --line-strong: #cbd5e1;
+      --primary: #0f172a;
+      --primary-ink: #ffffff;
       --accent: #2563eb;
-      --accent-soft: #eff6ff;
-      --success: #16a34a;
-      --success-soft: #ecfdf5;
+      --accent-soft: #dbeafe;
+      --success: #047857;
+      --success-soft: #d1fae5;
       --danger: #dc2626;
-      --danger-soft: #fef2f2;
-      --radius-lg: 24px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
-      --shadow: 0 16px 45px rgba(15, 23, 42, 0.10);
+      --danger-soft: #fee2e2;
+      --warning: #b45309;
+      --warning-soft: #fef3c7;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.16);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --tap: 48px;
+      --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #020617;
+        --bg-2: #0f172a;
+        --card: rgba(15, 23, 42, 0.92);
+        --card-solid: #111827;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --line: #1e293b;
+        --line-strong: #334155;
+        --primary: #f8fafc;
+        --primary-ink: #020617;
+        --accent-soft: rgba(37, 99, 235, 0.2);
+        --success-soft: rgba(4, 120, 87, 0.22);
+        --danger-soft: rgba(220, 38, 38, 0.2);
+        --warning-soft: rgba(180, 83, 9, 0.24);
+        --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+      }
     }
 
-    html {
-      min-height: 100%;
-    }
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; }
 
     body {
       min-height: 100%;
       margin: 0;
+      font-family: var(--font);
       background:
-        radial-gradient(circle at top, rgba(37, 99, 235, 0.08), transparent 32rem),
-        var(--bg);
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.25), transparent 32rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
       color: var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      line-height: 1.45;
-      padding: 14px;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     button,
-    input {
+    input,
+    select {
       font: inherit;
     }
 
     button {
-      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .shell {
+      width: min(100%, 760px);
+      margin-inline: auto;
+      padding: max(16px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom));
+    }
+
+    .hero {
+      padding: 8px 4px 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 0 5px var(--success-soft);
+    }
+
+    h1 {
+      margin: 16px 0 8px;
+      font-size: clamp(2.15rem, 12vw, 4.5rem);
+      line-height: 0.92;
+      letter-spacing: -0.075em;
+    }
+
+    .subtitle {
+      max-width: 58ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
     }
 
     .app {
-      width: min(100%, 560px);
-      margin: 0 auto;
-      background: var(--card);
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
       overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
     }
 
-    .app__header {
-      padding: 24px 18px 16px;
-      text-align: center;
+    .section {
+      padding: 18px;
+      border-top: 1px solid var(--line);
     }
 
-    .app__title {
-      margin: 0;
-      font-size: clamp(1.45rem, 7vw, 2rem);
-      line-height: 1.1;
-      letter-spacing: -0.04em;
-    }
-
-    .app__subtitle {
-      margin: 8px auto 0;
-      max-width: 34rem;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .form {
-      display: grid;
-      gap: 18px;
-      padding: 0 14px 18px;
-    }
-
-    .panel {
-      display: grid;
-      gap: 14px;
-      padding: 14px;
-      background: var(--card-muted);
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius-md);
-    }
-
-    .panel--success {
-      background: var(--success-soft);
-      border-color: #bbf7d0;
-    }
+    .section:first-child { border-top: 0; }
 
     .section-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
       margin: 0;
-      font-size: 0.88rem;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hint {
+      margin: 4px 0 0;
       color: var(--muted);
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
     }
 
     .field {
       display: grid;
-      gap: 7px;
+      gap: 8px;
     }
 
-    .field__label {
+    label,
+    .label {
       color: var(--muted);
-      font-size: 0.76rem;
+      font-size: 0.73rem;
       font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      letter-spacing: 0.055em;
     }
 
-    .field__hint {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.82rem;
-    }
-
-    .input {
+    input,
+    select {
       width: 100%;
-      min-height: 48px;
-      padding: 12px 14px;
+      min-height: var(--tap);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-md);
+      background: var(--card-solid);
       color: var(--text);
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-size: 1rem;
       outline: none;
-      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
     }
 
-    .input:focus {
+    input:focus,
+    select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.13);
+      box-shadow: 0 0 0 4px var(--accent-soft);
     }
 
-    .input::placeholder {
-      color: #9ca3af;
-    }
+    input::placeholder { color: color-mix(in srgb, var(--muted) 70%, transparent); }
 
-    .row {
+    .amount-wrap {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
+      grid-template-columns: 5rem 1fr;
+      gap: 10px;
     }
 
-    .row--bill {
-      grid-template-columns: minmax(0, 1fr) 118px;
+    .quick-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
     }
 
-    .groups {
+    .chip-button,
+    .ghost-button,
+    .primary-button,
+    .danger-button {
+      min-height: var(--tap);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line-strong);
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    .chip-button {
+      background: var(--card-solid);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .chip-button:active,
+    .ghost-button:active,
+    .primary-button:active,
+    .danger-button:active {
+      transform: scale(0.985);
+    }
+
+    .ghost-button {
+      background: var(--card-solid);
+      color: var(--text);
+    }
+
+    .primary-button {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: var(--primary-ink);
+    }
+
+    .danger-button {
+      border-color: color-mix(in srgb, var(--danger) 24%, var(--line));
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .people-meter {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .meter-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--card-solid);
+      padding: 12px;
+    }
+
+    .meter-value {
+      margin-top: 4px;
+      font-size: 1.45rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .method-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--accent-soft);
+      padding: 14px;
+    }
+
+    .method-card strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .group-list {
       display: grid;
       gap: 12px;
     }
 
     .group-card {
-      display: grid;
-      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--card-solid);
       padding: 14px;
-      background: #ffffff;
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius-md);
-      animation: enter 180ms ease-out;
     }
 
-    @keyframes enter {
-      from {
-        opacity: 0;
-        transform: translateY(-4px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .group-card__top {
+    .group-card-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      margin-bottom: 12px;
     }
 
-    .group-card__title {
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.055em;
-    }
-
-    .group-card__inputs {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: 1fr;
-    }
-
-    .button {
-      min-height: 48px;
+    .group-tag {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 14px;
-      border: 1px solid transparent;
-      font-weight: 800;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .group-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
       cursor: pointer;
-      transition: transform 120ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease;
     }
 
-    .button:active {
-      transform: scale(0.985);
-    }
-
-    .button:focus-visible {
-      outline: 3px solid rgba(37, 99, 235, 0.24);
-      outline-offset: 2px;
-    }
-
-    .button--primary {
-      color: #ffffff;
-      background: var(--primary);
-      border-color: var(--primary);
-    }
-
-    .button--primary:hover {
-      background: var(--primary-hover);
-      border-color: var(--primary-hover);
-    }
-
-    .button--ghost {
-      color: var(--accent);
-      background: #ffffff;
-      border: 2px dashed #bfdbfe;
-    }
-
-    .button--ghost:hover {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-    }
-
-    .button--danger {
-      width: auto;
-      min-height: 36px;
-      padding: 7px 10px;
-      color: var(--danger);
-      background: var(--danger-soft);
-      border-color: #fecaca;
-      font-size: 0.85rem;
-    }
-
-    .button--danger:hover {
+    .icon-button:hover,
+    .icon-button:focus-visible {
       border-color: var(--danger);
+      color: var(--danger);
     }
 
-    .button--secondary {
-      color: var(--text);
-      background: #ffffff;
-      border-color: var(--border);
+    .group-grid {
+      display: grid;
+      gap: 10px;
     }
 
-    .button--secondary:hover {
-      border-color: var(--accent);
-      color: var(--accent);
+    .standard-card {
+      border: 1px solid color-mix(in srgb, var(--success) 30%, var(--line));
+      border-radius: var(--radius-lg);
+      background: var(--success-soft);
+      padding: 14px;
     }
 
-    .alert {
+    .standard-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--card-solid);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .actions {
+      position: sticky;
+      bottom: 0;
+      display: grid;
+      gap: 10px;
+      padding: 14px 18px calc(14px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: color-mix(in srgb, var(--card-solid) 88%, transparent);
+      backdrop-filter: blur(18px);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .status {
       display: none;
+      border-radius: var(--radius-md);
       padding: 12px 14px;
-      color: #991b1b;
-      background: var(--danger-soft);
-      border: 1px solid #fecaca;
-      border-radius: var(--radius-sm);
-      font-weight: 700;
+      font-size: 0.92rem;
+      font-weight: 750;
+      line-height: 1.45;
     }
 
-    .alert[aria-hidden="false"] {
-      display: block;
-    }
+    .status.show { display: block; }
+    .status.error { background: var(--danger-soft); color: var(--danger); }
+    .status.warning { background: var(--warning-soft); color: var(--warning); }
 
     .results {
       display: none;
-      gap: 14px;
-      padding: 18px 14px 18px;
-      border-top: 1px solid var(--border-soft);
-      background: linear-gradient(180deg, #ffffff, #f8fafc);
-    }
-
-    .results[aria-hidden="false"] {
-      display: grid;
-    }
-
-    .total-card {
       padding: 18px;
-      text-align: center;
-      background: #ffffff;
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius-md);
+      border-top: 1px solid var(--line);
+      background: color-mix(in srgb, var(--card-solid) 72%, transparent);
     }
 
-    .total-card__label {
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+    .results.show { display: block; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
     }
 
-    .total-card__amount {
-      margin-top: 4px;
-      font-size: clamp(2rem, 10vw, 2.7rem);
-      line-height: 1;
-      font-weight: 900;
-      letter-spacing: -0.06em;
+    .summary-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--card-solid);
+      padding: 13px;
+    }
+
+    .summary-card.full { grid-column: 1 / -1; }
+
+    .summary-value {
+      margin-top: 5px;
+      font-size: 1.45rem;
+      font-weight: 950;
+      letter-spacing: -0.05em;
     }
 
     .result-list {
@@ -341,646 +449,777 @@
     }
 
     .result-card {
-      display: grid;
-      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--card-solid);
       padding: 14px;
-      background: #ffffff;
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius-md);
     }
 
-    .result-card__title {
-      font-weight: 850;
+    .result-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
     }
 
-    .result-card__meta {
-      margin-top: 2px;
+    .result-name {
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .result-meta {
+      margin-top: 5px;
       color: var(--muted);
       font-size: 0.88rem;
+      line-height: 1.35;
     }
 
-    .result-card__amount {
-      font-size: 1.28rem;
-      font-weight: 900;
-      letter-spacing: -0.025em;
+    .result-amount {
+      text-align: right;
+      font-size: 1.25rem;
+      font-weight: 950;
+      white-space: nowrap;
+      letter-spacing: -0.04em;
     }
 
-    .summary-grid {
-      display: grid;
-      gap: 8px;
-      padding: 14px;
-      background: #ffffff;
-      border: 1px solid var(--border-soft);
-      border-radius: var(--radius-md);
+    .result-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--line-strong);
       color: var(--muted);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
+      font-weight: 750;
     }
 
-    .summary-grid strong {
-      color: var(--text);
+    .rounding-note {
+      margin-top: 10px;
+      border-radius: 12px;
+      background: var(--warning-soft);
+      color: var(--warning);
+      padding: 10px 12px;
+      font-size: 0.86rem;
+      font-weight: 750;
+      line-height: 1.4;
     }
 
     .toast {
       position: fixed;
-      z-index: 10;
+      z-index: 20;
       left: 50%;
-      bottom: max(18px, env(safe-area-inset-bottom));
-      transform: translateX(-50%) translateY(18px);
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      transform: translate(-50%, 120%);
       width: max-content;
       max-width: calc(100vw - 28px);
-      padding: 11px 16px;
-      color: #ffffff;
-      background: rgba(17, 24, 39, 0.94);
       border-radius: 999px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.24);
+      background: #020617;
+      color: #ffffff;
+      padding: 12px 16px;
+      font-weight: 850;
+      font-size: 0.9rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
       opacity: 0;
+      transition: transform 180ms ease, opacity 180ms ease;
       pointer-events: none;
-      transition: opacity 180ms ease, transform 180ms ease;
     }
 
-    .toast.is-visible {
+    .toast.show {
+      transform: translate(-50%, 0);
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
     }
 
-    @media (min-width: 520px) {
-      body {
-        padding: 24px;
-      }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
 
-      .app__header {
-        padding: 32px 28px 20px;
-      }
-
-      .form,
-      .results {
-        padding-left: 24px;
-        padding-right: 24px;
-      }
-
-      .group-card__inputs {
-        grid-template-columns: minmax(0, 1.6fr) 0.7fr 0.8fr;
-      }
-
-      .result-card {
-        grid-template-columns: minmax(0, 1fr) auto;
+    @media (min-width: 640px) {
+      .shell { padding: 34px 22px 42px; }
+      .hero { padding-inline: 8px; }
+      .section,
+      .results { padding: 24px; }
+      .grid.two,
+      .group-grid { grid-template-columns: 1.15fr 0.7fr 0.7fr; }
+      .actions {
+        grid-template-columns: 1fr auto;
         align-items: center;
+        padding: 18px 24px;
       }
-    }
-
-    @media (max-width: 380px) {
-      body {
-        padding: 10px;
-      }
-
-      .row--bill {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
+      .button-row { min-width: 280px; }
     }
   </style>
 </head>
 <body>
-  <main class="app" aria-labelledby="appTitle">
-    <header class="app__header">
-      <h1 class="app__title" id="appTitle">Power Splitter</h1>
-      <p class="app__subtitle">Mobile-first bill splitter with saved groups, weighted extras, and copy-ready results.</p>
+  <div class="shell">
+    <header class="hero">
+      <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Mobile-first split calculator</div>
+      <h1>Power Splitter</h1>
+      <p class="subtitle">Fast bill splitting for the current setup: Rubel and Shafayet pay the extra share, Iqbal stays in the standard group.</p>
     </header>
 
-    <form class="form" id="splitForm" novalidate>
-      <section class="panel" aria-label="Bill details">
-        <div class="row row--bill">
-          <div class="field">
-            <label class="field__label" for="totalBill">Total bill</label>
-            <input
-              class="input"
-              id="totalBill"
-              name="totalBill"
-              type="number"
-              min="0"
-              step="0.01"
-              inputmode="decimal"
-              placeholder="0.00"
-              autocomplete="off"
-            />
+    <main class="app" aria-labelledby="app-title">
+      <h2 id="app-title" class="sr-only">Power Splitter calculator</h2>
+
+      <section class="section">
+        <div class="section-title">
+          <div>
+            <h2>Bill details</h2>
+            <p class="hint">Enter the full bill. The app saves your latest setup on this device.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="amount-wrap">
+            <div class="field">
+              <label for="currencySymbol">Currency</label>
+              <input id="currencySymbol" type="text" inputmode="text" maxlength="4" autocomplete="off" aria-label="Currency symbol" />
+            </div>
+            <div class="field">
+              <label for="totalBill">Total bill</label>
+              <input id="totalBill" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" />
+            </div>
           </div>
 
           <div class="field">
-            <label class="field__label" for="totalPeople">People</label>
-            <input
-              class="input"
-              id="totalPeople"
-              name="totalPeople"
-              type="number"
-              min="1"
-              step="1"
-              inputmode="numeric"
-              value="3"
-              autocomplete="off"
-            />
+            <label for="totalPeople">Total people</label>
+            <input id="totalPeople" type="number" inputmode="numeric" min="1" max="500" step="1" />
+          </div>
+
+          <div class="quick-row" aria-label="Quick bill amounts">
+            <button class="chip-button" type="button" data-quick="1000">৳1,000</button>
+            <button class="chip-button" type="button" data-quick="2000">৳2,000</button>
+            <button class="chip-button" type="button" data-quick="5000">৳5,000</button>
+          </div>
+        </div>
+
+        <div class="people-meter" aria-live="polite">
+          <div class="meter-card">
+            <div class="label">Special</div>
+            <div id="specialPeople" class="meter-value">2</div>
+          </div>
+          <div class="meter-card">
+            <div class="label">Standard</div>
+            <div id="standardPeople" class="meter-value">1</div>
           </div>
         </div>
       </section>
 
-      <section class="panel" aria-labelledby="groupsTitle">
-        <h2 class="section-title" id="groupsTitle">Special groups</h2>
-        <p class="field__hint">People here pay the normal base share plus their extra percentage of the total bill.</p>
-        <div class="groups" id="groupsContainer"></div>
-        <button class="button button--ghost" id="addGroupBtn" type="button">+ Add special group</button>
-      </section>
-
-      <section class="panel panel--success" aria-label="Remainder group">
-        <div class="field">
-          <label class="field__label" for="remainderName">Standard / remainder group</label>
-          <input
-            class="input"
-            id="remainderName"
-            name="remainderName"
-            type="text"
-            value="Iqbal"
-            placeholder="e.g. Iqbal"
-            autocomplete="off"
-          />
-          <p class="field__hint">Everyone not listed in a special group is counted here automatically.</p>
+      <section class="section">
+        <div class="section-title">
+          <div>
+            <h2>Split method</h2>
+            <p class="hint">Best-practice weighted split: 12% means that person pays 12% more than the standard person.</p>
+          </div>
+        </div>
+        <div class="method-card">
+          <strong>Fair weighted percentage</strong>
+          <span class="hint">Standard people have weight 1. A 12% extra person has weight 1.12. This keeps the final total matched to the bill.</span>
         </div>
       </section>
 
-      <div class="alert" id="errorBox" role="alert" aria-live="assertive" aria-hidden="true"></div>
+      <section class="section">
+        <div class="section-title">
+          <div>
+            <h2>Special groups</h2>
+            <p class="hint">People here pay extra. Default: Rubel and Shafayet at 12%.</p>
+          </div>
+          <button id="addGroup" class="ghost-button" type="button">Add</button>
+        </div>
+        <div id="groupList" class="group-list" aria-live="polite"></div>
+      </section>
 
-      <button class="button button--primary" type="submit">Calculate split</button>
-    </form>
+      <section class="section">
+        <div class="standard-card">
+          <div class="standard-top">
+            <div>
+              <h2>Standard group</h2>
+              <p class="hint">Everyone not listed above goes here automatically.</p>
+            </div>
+            <span id="standardPill" class="pill">1 person</span>
+          </div>
+          <div class="field">
+            <label for="standardName">Standard group name</label>
+            <input id="standardName" type="text" autocomplete="off" />
+          </div>
+        </div>
+      </section>
 
-    <section class="results" id="results" aria-live="polite" aria-hidden="true">
-      <div class="total-card">
-        <div class="total-card__label">Total bill</div>
-        <div class="total-card__amount" id="totalOutput">0.00</div>
+      <section id="statusBox" class="status" role="alert" aria-live="assertive"></section>
+
+      <section id="results" class="results" aria-live="polite">
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="label">Total bill</div>
+            <div id="resultTotal" class="summary-value">৳0.00</div>
+          </div>
+          <div class="summary-card">
+            <div class="label">Allocated</div>
+            <div id="allocatedTotal" class="summary-value">৳0.00</div>
+          </div>
+          <div class="summary-card full">
+            <div class="label">Base standard share</div>
+            <div id="baseShare" class="summary-value">৳0.00</div>
+            <p id="baseHint" class="hint">Before any extra percentage.</p>
+          </div>
+        </div>
+        <div id="resultList" class="result-list"></div>
+      </section>
+
+      <div class="actions">
+        <button id="calculate" class="primary-button" type="button">Calculate split</button>
+        <div class="button-row">
+          <button id="copySummary" class="ghost-button" type="button" disabled>Copy</button>
+          <button id="resetDefaults" class="danger-button" type="button">Reset</button>
+        </div>
       </div>
+    </main>
+  </div>
 
-      <div class="summary-grid" id="summaryDetails"></div>
-      <div class="result-list" id="resultList"></div>
-
-      <button class="button button--secondary" id="copyBtn" type="button">Copy summary</button>
-      <button class="button button--secondary" id="resetBtn" type="button">Reset saved data</button>
-    </section>
-  </main>
-
-  <div class="toast" id="toast" role="status" aria-live="polite">Copied to clipboard</div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Copied</div>
 
   <script>
-    "use strict";
+    (() => {
+      'use strict';
 
-    const STORAGE_KEY = "power_splitter_mobile_first_v2";
+      const STORAGE_KEY = 'power_splitter_rebuilt_v1';
 
-    const DEFAULT_STATE = {
-      totalBill: "",
-      totalPeople: "3",
-      remainderName: "Iqbal",
-      groups: [
-        { name: "Rubel, Shafayet", count: "2", percent: "12" }
-      ]
-    };
+      const DEFAULT_STATE = Object.freeze({
+        currencySymbol: '৳',
+        totalBill: '',
+        totalPeople: '3',
+        standardName: 'Iqbal',
+        groups: Object.freeze([
+          Object.freeze({ name: 'Rubel, Shafayet', count: '2', percent: '12' })
+        ])
+      });
 
-    const dom = {
-      form: document.getElementById("splitForm"),
-      totalBill: document.getElementById("totalBill"),
-      totalPeople: document.getElementById("totalPeople"),
-      remainderName: document.getElementById("remainderName"),
-      groupsContainer: document.getElementById("groupsContainer"),
-      addGroupBtn: document.getElementById("addGroupBtn"),
-      errorBox: document.getElementById("errorBox"),
-      results: document.getElementById("results"),
-      totalOutput: document.getElementById("totalOutput"),
-      summaryDetails: document.getElementById("summaryDetails"),
-      resultList: document.getElementById("resultList"),
-      copyBtn: document.getElementById("copyBtn"),
-      resetBtn: document.getElementById("resetBtn"),
-      toast: document.getElementById("toast")
-    };
+      const elements = {
+        currencySymbol: document.getElementById('currencySymbol'),
+        totalBill: document.getElementById('totalBill'),
+        totalPeople: document.getElementById('totalPeople'),
+        standardName: document.getElementById('standardName'),
+        specialPeople: document.getElementById('specialPeople'),
+        standardPeople: document.getElementById('standardPeople'),
+        standardPill: document.getElementById('standardPill'),
+        addGroup: document.getElementById('addGroup'),
+        groupList: document.getElementById('groupList'),
+        calculate: document.getElementById('calculate'),
+        copySummary: document.getElementById('copySummary'),
+        resetDefaults: document.getElementById('resetDefaults'),
+        statusBox: document.getElementById('statusBox'),
+        results: document.getElementById('results'),
+        resultTotal: document.getElementById('resultTotal'),
+        allocatedTotal: document.getElementById('allocatedTotal'),
+        baseShare: document.getElementById('baseShare'),
+        baseHint: document.getElementById('baseHint'),
+        resultList: document.getElementById('resultList'),
+        toast: document.getElementById('toast')
+      };
 
-    let lastSummary = "";
-    let toastTimer = 0;
+      let state = cloneDefaultState();
+      let lastSummary = '';
+      let toastTimer = 0;
 
-    function createId(prefix) {
-      if (window.crypto && typeof window.crypto.randomUUID === "function") {
-        return `${prefix}-${window.crypto.randomUUID()}`;
+      function cloneDefaultState() {
+        return JSON.parse(JSON.stringify(DEFAULT_STATE));
       }
 
-      return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    }
-
-    function toNumber(value) {
-      const number = Number.parseFloat(String(value).trim());
-      return Number.isFinite(number) ? number : 0;
-    }
-
-    function toInteger(value) {
-      const number = Number.parseInt(String(value).trim(), 10);
-      return Number.isFinite(number) ? number : 0;
-    }
-
-    function round2(value) {
-      return Math.round((value + Number.EPSILON) * 100) / 100;
-    }
-
-    function formatMoney(value) {
-      return round2(value).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
-
-    function setHidden(element, isHidden) {
-      element.setAttribute("aria-hidden", String(isHidden));
-    }
-
-    function showError(message) {
-      dom.errorBox.textContent = message;
-      setHidden(dom.errorBox, false);
-      setHidden(dom.results, true);
-    }
-
-    function clearError() {
-      dom.errorBox.textContent = "";
-      setHidden(dom.errorBox, true);
-    }
-
-    function makeField(labelText, inputClass, inputType, value, options) {
-      const field = document.createElement("div");
-      field.className = "field";
-
-      const id = createId(inputClass);
-      const label = document.createElement("label");
-      label.className = "field__label";
-      label.htmlFor = id;
-      label.textContent = labelText;
-
-      const input = document.createElement("input");
-      input.className = `input ${inputClass}`;
-      input.id = id;
-      input.type = inputType;
-      input.value = value ?? "";
-      input.autocomplete = "off";
-
-      if (options.placeholder) input.placeholder = options.placeholder;
-      if (options.inputmode) input.inputMode = options.inputmode;
-      if (options.min !== undefined) input.min = String(options.min);
-      if (options.max !== undefined) input.max = String(options.max);
-      if (options.step !== undefined) input.step = String(options.step);
-
-      field.append(label, input);
-      return field;
-    }
-
-    function createGroupCard(group = {}) {
-      const card = document.createElement("article");
-      card.className = "group-card";
-
-      const top = document.createElement("div");
-      top.className = "group-card__top";
-
-      const title = document.createElement("div");
-      title.className = "group-card__title";
-      title.textContent = "Group details";
-
-      const removeButton = document.createElement("button");
-      removeButton.className = "button button--danger";
-      removeButton.type = "button";
-      removeButton.textContent = "Remove";
-      removeButton.setAttribute("aria-label", "Remove this special group");
-
-      top.append(title, removeButton);
-
-      const inputs = document.createElement("div");
-      inputs.className = "group-card__inputs";
-
-      const nameField = makeField("Name", "group-name", "text", group.name ?? "", {
-        placeholder: "Group name"
-      });
-
-      const countField = makeField("People", "group-count", "number", group.count ?? "1", {
-        placeholder: "0",
-        inputmode: "numeric",
-        min: 0,
-        step: 1
-      });
-
-      const percentField = makeField("Extra %", "group-percent", "number", group.percent ?? "0", {
-        placeholder: "0",
-        inputmode: "decimal",
-        min: 0,
-        max: 100,
-        step: 0.01
-      });
-
-      inputs.append(nameField, countField, percentField);
-      card.append(top, inputs);
-
-      return card;
-    }
-
-    function addGroup(group = {}, shouldFocus = false) {
-      const card = createGroupCard(group);
-      dom.groupsContainer.append(card);
-      persistState();
-
-      if (shouldFocus) {
-        const input = card.querySelector(".group-name");
-        if (input) input.focus();
+      function normalizeState(value) {
+        const base = cloneDefaultState();
+        if (!value || typeof value !== 'object') return base;
+        return {
+          currencySymbol: stringOr(value.currencySymbol, base.currencySymbol).slice(0, 4) || base.currencySymbol,
+          totalBill: stringOr(value.totalBill, base.totalBill),
+          totalPeople: stringOr(value.totalPeople, base.totalPeople),
+          standardName: stringOr(value.standardName, base.standardName),
+          groups: Array.isArray(value.groups) && value.groups.length
+            ? value.groups.map((group) => ({
+                name: stringOr(group.name, ''),
+                count: stringOr(group.count, '1'),
+                percent: stringOr(group.percent, '0')
+              })).slice(0, 20)
+            : base.groups
+        };
       }
-    }
 
-    function readGroups() {
-      return Array.from(dom.groupsContainer.querySelectorAll(".group-card")).map((card) => {
-        const name = card.querySelector(".group-name").value.trim();
-        const count = card.querySelector(".group-count").value;
-        const percent = card.querySelector(".group-percent").value;
+      function stringOr(value, fallback) {
+        if (value === null || value === undefined) return fallback;
+        return String(value);
+      }
+
+      function loadState() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          state = saved ? normalizeState(JSON.parse(saved)) : cloneDefaultState();
+        } catch (_error) {
+          state = cloneDefaultState();
+        }
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (_error) {
+          // The app still works if storage is unavailable.
+        }
+      }
+
+      function syncFieldsFromState() {
+        elements.currencySymbol.value = state.currencySymbol;
+        elements.totalBill.value = state.totalBill;
+        elements.totalPeople.value = state.totalPeople;
+        elements.standardName.value = state.standardName;
+      }
+
+      function readFieldsToState() {
+        state.currencySymbol = elements.currencySymbol.value.trim() || DEFAULT_STATE.currencySymbol;
+        state.totalBill = elements.totalBill.value.trim();
+        state.totalPeople = elements.totalPeople.value.trim();
+        state.standardName = elements.standardName.value.trim() || DEFAULT_STATE.standardName;
+      }
+
+      function parsePositiveInteger(value) {
+        if (!/^\d+$/.test(String(value).trim())) return NaN;
+        return Number.parseInt(value, 10);
+      }
+
+      function parseMoneyToCents(value) {
+        const raw = String(value).trim().replace(/,/g, '');
+        if (!/^\d+(\.\d{0,2})?$/.test(raw)) return NaN;
+        return Math.round(Number(raw) * 100);
+      }
+
+      function parsePercent(value) {
+        const raw = String(value).trim();
+        if (!/^\d+(\.\d{0,2})?$/.test(raw)) return NaN;
+        return Number(raw);
+      }
+
+      function formatCents(cents) {
+        const symbol = state.currencySymbol || DEFAULT_STATE.currencySymbol;
+        const sign = cents < 0 ? '-' : '';
+        const amount = Math.abs(cents) / 100;
+        return `${sign}${symbol}${amount.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}`;
+      }
+
+      function pluralize(count, singular, plural) {
+        return `${count} ${count === 1 ? singular : plural}`;
+      }
+
+      function setStatus(message, type = 'error') {
+        elements.statusBox.textContent = message;
+        elements.statusBox.className = `status show ${type}`;
+      }
+
+      function clearStatus() {
+        elements.statusBox.textContent = '';
+        elements.statusBox.className = 'status';
+      }
+
+      function hideResults() {
+        elements.results.classList.remove('show');
+        elements.copySummary.disabled = true;
+        lastSummary = '';
+      }
+
+      function createInput(id, labelText, value, options = {}) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'field';
+
+        const label = document.createElement('label');
+        label.setAttribute('for', id);
+        label.textContent = labelText;
+
+        const input = document.createElement('input');
+        input.id = id;
+        input.value = value;
+        input.type = options.type || 'text';
+        input.inputMode = options.inputMode || 'text';
+        input.autocomplete = 'off';
+        if (options.min !== undefined) input.min = options.min;
+        if (options.max !== undefined) input.max = options.max;
+        if (options.step !== undefined) input.step = options.step;
+        if (options.placeholder) input.placeholder = options.placeholder;
+
+        wrapper.append(label, input);
+        return { wrapper, input };
+      }
+
+      function renderGroups() {
+        elements.groupList.textContent = '';
+
+        state.groups.forEach((group, index) => {
+          const card = document.createElement('article');
+          card.className = 'group-card';
+
+          const head = document.createElement('div');
+          head.className = 'group-card-head';
+
+          const tag = document.createElement('div');
+          tag.className = 'group-tag';
+          const tagDot = document.createElement('span');
+          tagDot.className = 'group-dot';
+          tagDot.setAttribute('aria-hidden', 'true');
+          const tagText = document.createElement('span');
+          tagText.textContent = `Special group ${index + 1}`;
+          tag.append(tagDot, tagText);
+
+          const removeButton = document.createElement('button');
+          removeButton.className = 'icon-button';
+          removeButton.type = 'button';
+          removeButton.setAttribute('aria-label', `Remove special group ${index + 1}`);
+          removeButton.textContent = '×';
+          removeButton.addEventListener('click', () => {
+            state.groups.splice(index, 1);
+            if (!state.groups.length) {
+              state.groups.push({ name: '', count: '1', percent: '0' });
+            }
+            renderGroups();
+            handleStateChanged({ keepResults: false });
+          });
+
+          head.append(tag, removeButton);
+
+          const grid = document.createElement('div');
+          grid.className = 'group-grid';
+
+          const nameField = createInput(`group-name-${index}`, 'Names', group.name, {
+            placeholder: 'Rubel, Shafayet'
+          });
+          const countField = createInput(`group-count-${index}`, 'People', group.count, {
+            type: 'number', inputMode: 'numeric', min: '0', max: '500', step: '1'
+          });
+          const percentField = createInput(`group-percent-${index}`, 'Extra %', group.percent, {
+            type: 'text', inputMode: 'decimal', placeholder: '12'
+          });
+
+          nameField.input.addEventListener('input', () => {
+            state.groups[index].name = nameField.input.value;
+            handleStateChanged({ keepResults: false });
+          });
+          countField.input.addEventListener('input', () => {
+            state.groups[index].count = countField.input.value;
+            handleStateChanged({ keepResults: false });
+          });
+          percentField.input.addEventListener('input', () => {
+            state.groups[index].percent = percentField.input.value;
+            handleStateChanged({ keepResults: false });
+          });
+
+          grid.append(nameField.wrapper, countField.wrapper, percentField.wrapper);
+          card.append(head, grid);
+          elements.groupList.appendChild(card);
+        });
+      }
+
+      function getCleanInputs() {
+        readFieldsToState();
+
+        const totalCents = parseMoneyToCents(state.totalBill);
+        const totalPeople = parsePositiveInteger(state.totalPeople);
+        const groups = state.groups.map((group, index) => ({
+          index,
+          name: group.name.trim() || `Special group ${index + 1}`,
+          count: parsePositiveInteger(group.count || '0'),
+          percent: parsePercent(group.percent || '0')
+        }));
+
+        return { totalCents, totalPeople, groups, standardName: state.standardName.trim() || 'Standard group' };
+      }
+
+      function validateInputs(clean) {
+        if (!Number.isFinite(clean.totalCents) || clean.totalCents <= 0) {
+          return 'Enter a valid bill amount using up to 2 decimals, for example 1250 or 1250.50.';
+        }
+        if (!Number.isInteger(clean.totalPeople) || clean.totalPeople <= 0 || clean.totalPeople > 500) {
+          return 'Enter a valid total people count between 1 and 500.';
+        }
+
+        let specialPeople = 0;
+        for (const group of clean.groups) {
+          if (!Number.isInteger(group.count) || group.count < 0 || group.count > 500) {
+            return `Enter a valid people count for ${group.name}.`;
+          }
+          if (!Number.isFinite(group.percent) || group.percent < 0 || group.percent > 500) {
+            return `Extra percent for ${group.name} must be between 0 and 500.`;
+          }
+          specialPeople += group.count;
+        }
+
+        if (specialPeople > clean.totalPeople) {
+          return `Special group people (${specialPeople}) exceed total people (${clean.totalPeople}).`;
+        }
+        return '';
+      }
+
+      function updatePeoplePreview() {
+        const totalPeople = parsePositiveInteger(elements.totalPeople.value || state.totalPeople) || 0;
+        const specialPeople = state.groups.reduce((sum, group) => {
+          const count = parsePositiveInteger(group.count || '0');
+          return sum + (Number.isInteger(count) ? count : 0);
+        }, 0);
+        const standardPeople = Math.max(totalPeople - specialPeople, 0);
+
+        elements.specialPeople.textContent = specialPeople;
+        elements.standardPeople.textContent = standardPeople;
+        elements.standardPill.textContent = pluralize(standardPeople, 'person', 'people');
+      }
+
+      function calculateSplit() {
+        clearStatus();
+        readFieldsToState();
+        saveState();
+
+        const clean = getCleanInputs();
+        const error = validateInputs(clean);
+        if (error) {
+          setStatus(error, 'error');
+          hideResults();
+          return null;
+        }
+
+        const activeGroups = clean.groups.filter((group) => group.count > 0);
+        const specialPeople = activeGroups.reduce((sum, group) => sum + group.count, 0);
+        const standardPeople = clean.totalPeople - specialPeople;
+
+        const weightedUnits = standardPeople + activeGroups.reduce((sum, group) => {
+          return sum + group.count * (1 + group.percent / 100);
+        }, 0);
+
+        if (weightedUnits <= 0) {
+          setStatus('At least one person must be included in the split.', 'error');
+          hideResults();
+          return null;
+        }
+
+        const baseRawCents = clean.totalCents / weightedUnits;
+        const rows = [];
+
+        for (const group of activeGroups) {
+          const rawPerPerson = baseRawCents * (1 + group.percent / 100);
+          rows.push({
+            type: 'special',
+            name: group.name,
+            count: group.count,
+            percent: group.percent,
+            perPersonCents: Math.round(rawPerPerson),
+            groupTotalCents: Math.round(rawPerPerson) * group.count,
+            adjustmentCents: 0,
+            meta: `${pluralize(group.count, 'person', 'people')} · ${group.percent}% extra`
+          });
+        }
+
+        if (standardPeople > 0) {
+          rows.push({
+            type: 'standard',
+            name: clean.standardName,
+            count: standardPeople,
+            percent: 0,
+            perPersonCents: Math.round(baseRawCents),
+            groupTotalCents: Math.round(baseRawCents) * standardPeople,
+            adjustmentCents: 0,
+            meta: `${pluralize(standardPeople, 'person', 'people')} · standard share`
+          });
+        }
+
+        const roundedTotal = rows.reduce((sum, row) => sum + row.groupTotalCents, 0);
+        const difference = clean.totalCents - roundedTotal;
+        if (difference !== 0 && rows.length) {
+          const target = rows.find((row) => row.type === 'standard') || rows[0];
+          target.adjustmentCents += difference;
+          target.groupTotalCents += difference;
+        }
 
         return {
-          name: name || "Unnamed group",
-          count: toInteger(count),
-          percent: toNumber(percent)
+          totalCents: clean.totalCents,
+          allocatedCents: rows.reduce((sum, row) => sum + row.groupTotalCents, 0),
+          baseRawCents,
+          rows
         };
-      });
-    }
-
-    function readState() {
-      return {
-        totalBill: dom.totalBill.value,
-        totalPeople: dom.totalPeople.value,
-        remainderName: dom.remainderName.value,
-        groups: readGroups().map((group) => ({
-          name: group.name,
-          count: String(group.count),
-          percent: String(group.percent)
-        }))
-      };
-    }
-
-    function persistState() {
-      try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(readState()));
-      } catch {
-        // Storage can be unavailable in private browsing or restricted webviews.
       }
-    }
 
-    function loadState() {
-      let state = DEFAULT_STATE;
+      function renderResults(split) {
+        elements.resultTotal.textContent = formatCents(split.totalCents);
+        elements.allocatedTotal.textContent = formatCents(split.allocatedCents);
+        elements.baseShare.textContent = formatCents(Math.round(split.baseRawCents));
+        elements.baseHint.textContent = 'This is the standard share before extra percentage and final rounding.';
+        elements.resultList.textContent = '';
 
-      try {
-        const saved = window.localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && typeof parsed === "object") {
-            state = {
-              totalBill: parsed.totalBill ?? DEFAULT_STATE.totalBill,
-              totalPeople: parsed.totalPeople ?? DEFAULT_STATE.totalPeople,
-              remainderName: parsed.remainderName ?? DEFAULT_STATE.remainderName,
-              groups: Array.isArray(parsed.groups) && parsed.groups.length
-                ? parsed.groups
-                : DEFAULT_STATE.groups
-            };
+        const summaryLines = [
+          'Power Splitter',
+          `Total bill: ${formatCents(split.totalCents)}`,
+          'Method: fair weighted split',
+          ''
+        ];
+
+        for (const row of split.rows) {
+          renderResultRow(row);
+          summaryLines.push(`${row.name} (${row.meta}): ${formatCents(row.perPersonCents)} each`);
+          if (row.adjustmentCents !== 0) {
+            const direction = row.adjustmentCents > 0 ? 'add' : 'subtract';
+            summaryLines.push(`  Rounding: ${direction} ${formatCents(Math.abs(row.adjustmentCents))} to one person in this group.`);
           }
-        }
-      } catch {
-        state = DEFAULT_STATE;
-      }
-
-      dom.totalBill.value = state.totalBill;
-      dom.totalPeople.value = state.totalPeople;
-      dom.remainderName.value = state.remainderName;
-
-      dom.groupsContainer.replaceChildren();
-      state.groups.forEach((group) => addGroup(group));
-    }
-
-    function validate(totalBill, totalPeople, groups) {
-      if (!Number.isFinite(totalBill) || totalBill <= 0) {
-        return "Enter a total bill greater than 0.";
-      }
-
-      if (!Number.isInteger(totalPeople) || totalPeople <= 0) {
-        return "Enter a valid total people count.";
-      }
-
-      let groupedPeople = 0;
-
-      for (const group of groups) {
-        if (!Number.isInteger(group.count) || group.count < 0) {
-          return `People count must be a whole number for ${group.name}.`;
+          summaryLines.push(`  Group total: ${formatCents(row.groupTotalCents)}`);
         }
 
-        if (!Number.isFinite(group.percent) || group.percent < 0 || group.percent > 100) {
-          return `Extra % must be between 0 and 100 for ${group.name}.`;
+        summaryLines.push('', `Allocated total: ${formatCents(split.allocatedCents)}`);
+        lastSummary = summaryLines.join('\n');
+        elements.copySummary.disabled = false;
+        elements.results.classList.add('show');
+      }
+
+      function renderResultRow(row) {
+        const card = document.createElement('article');
+        card.className = 'result-card';
+
+        const top = document.createElement('div');
+        top.className = 'result-top';
+
+        const left = document.createElement('div');
+        const name = document.createElement('div');
+        name.className = 'result-name';
+        name.textContent = row.name;
+        const meta = document.createElement('div');
+        meta.className = 'result-meta';
+        meta.textContent = row.meta;
+        left.append(name, meta);
+
+        const amount = document.createElement('div');
+        amount.className = 'result-amount';
+        amount.textContent = `${formatCents(row.perPersonCents)} ea`;
+        top.append(left, amount);
+
+        const total = document.createElement('div');
+        total.className = 'result-total';
+        const totalLabel = document.createElement('span');
+        totalLabel.textContent = 'Group total';
+        const totalValue = document.createElement('strong');
+        totalValue.textContent = formatCents(row.groupTotalCents);
+        total.append(totalLabel, totalValue);
+
+        card.append(top, total);
+
+        if (row.adjustmentCents !== 0) {
+          const note = document.createElement('div');
+          note.className = 'rounding-note';
+          const action = row.adjustmentCents > 0 ? 'Add' : 'Subtract';
+          note.textContent = `${action} ${formatCents(Math.abs(row.adjustmentCents))} to one person in this group so the rounded totals match the bill exactly.`;
+          card.appendChild(note);
         }
 
-        groupedPeople += group.count;
+        elements.resultList.appendChild(card);
       }
 
-      if (groupedPeople > totalPeople) {
-        return `Special group people (${groupedPeople}) exceed total people (${totalPeople}).`;
+      function showToast(message) {
+        clearTimeout(toastTimer);
+        elements.toast.textContent = message;
+        elements.toast.classList.add('show');
+        toastTimer = window.setTimeout(() => {
+          elements.toast.classList.remove('show');
+        }, 1800);
       }
 
-      return "";
-    }
-
-    function addSummaryLine(label, value) {
-      const line = document.createElement("div");
-      const strong = document.createElement("strong");
-      strong.textContent = label;
-
-      line.append(strong, document.createTextNode(` ${value}`));
-      dom.summaryDetails.append(line);
-    }
-
-    function renderResult(title, meta, amount, groupTotal) {
-      const card = document.createElement("article");
-      card.className = "result-card";
-
-      const info = document.createElement("div");
-
-      const name = document.createElement("div");
-      name.className = "result-card__title";
-      name.textContent = title;
-
-      const details = document.createElement("div");
-      details.className = "result-card__meta";
-      details.textContent = meta;
-
-      info.append(name, details);
-
-      const value = document.createElement("div");
-      value.className = "result-card__amount";
-      value.textContent = formatMoney(amount);
-
-      if (Number.isFinite(groupTotal)) {
-        value.title = `Group total: ${formatMoney(groupTotal)}`;
+      async function copyText(text) {
+        if (!text) return;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (_error) {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'fixed';
+          textarea.style.top = '-1000px';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          textarea.remove();
+        }
       }
 
-      card.append(info, value);
-      dom.resultList.append(card);
-    }
-
-    function calculateSplit() {
-      clearError();
-
-      const totalBill = toNumber(dom.totalBill.value);
-      const totalPeople = toInteger(dom.totalPeople.value);
-      const remainderName = dom.remainderName.value.trim() || "Standard group";
-      const groups = readGroups();
-
-      const validationMessage = validate(totalBill, totalPeople, groups);
-      if (validationMessage) {
-        showError(validationMessage);
-        return;
+      function handleStateChanged(options = {}) {
+        readFieldsToState();
+        updatePeoplePreview();
+        saveState();
+        clearStatus();
+        if (!options.keepResults) hideResults();
       }
 
-      let totalExtra = 0;
-      let groupedPeople = 0;
-
-      const activeGroups = groups
-        .filter((group) => group.count > 0)
-        .map((group) => {
-          const extraPerPerson = totalBill * (group.percent / 100);
-          const groupExtraTotal = extraPerPerson * group.count;
-
-          totalExtra += groupExtraTotal;
-          groupedPeople += group.count;
-
-          return {
-            ...group,
-            extraPerPerson,
-            groupExtraTotal
-          };
+      function bindEvents() {
+        [elements.currencySymbol, elements.totalBill, elements.totalPeople, elements.standardName].forEach((input) => {
+          input.addEventListener('input', () => handleStateChanged({ keepResults: false }));
         });
 
-      if (totalExtra - totalBill > 0.000001) {
-        showError(`Extras (${formatMoney(totalExtra)}) exceed the total bill (${formatMoney(totalBill)}).`);
-        return;
+        document.querySelectorAll('[data-quick]').forEach((button) => {
+          button.addEventListener('click', () => {
+            elements.totalBill.value = button.getAttribute('data-quick') || '';
+            handleStateChanged({ keepResults: false });
+            elements.totalBill.focus();
+          });
+        });
+
+        elements.addGroup.addEventListener('click', () => {
+          state.groups.push({ name: '', count: '1', percent: '0' });
+          renderGroups();
+          handleStateChanged({ keepResults: false });
+          const newest = elements.groupList.querySelector(`#group-name-${state.groups.length - 1}`);
+          if (newest) newest.focus();
+        });
+
+        elements.calculate.addEventListener('click', () => {
+          const split = calculateSplit();
+          if (split) {
+            renderResults(split);
+            showToast('Split calculated');
+          }
+        });
+
+        elements.copySummary.addEventListener('click', async () => {
+          await copyText(lastSummary);
+          showToast('Summary copied');
+        });
+
+        elements.resetDefaults.addEventListener('click', () => {
+          state = cloneDefaultState();
+          try { localStorage.removeItem(STORAGE_KEY); } catch (_error) {}
+          syncFieldsFromState();
+          renderGroups();
+          updatePeoplePreview();
+          clearStatus();
+          hideResults();
+          showToast('Defaults restored');
+        });
+
+        document.addEventListener('keydown', (event) => {
+          if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+            event.preventDefault();
+            elements.calculate.click();
+          }
+        });
       }
 
-      const remainingBill = totalBill - totalExtra;
-      const baseShare = remainingBill / totalPeople;
-      const remainderPeople = totalPeople - groupedPeople;
-
-      dom.totalOutput.textContent = formatMoney(totalBill);
-      dom.summaryDetails.replaceChildren();
-      dom.resultList.replaceChildren();
-
-      addSummaryLine("Base share:", `${formatMoney(baseShare)} per person`);
-      addSummaryLine("Extra total:", formatMoney(totalExtra));
-      addSummaryLine("Standard people:", String(remainderPeople));
-
-      const summaryLines = [
-        "Bill Split",
-        `Total: ${formatMoney(totalBill)}`,
-        `Base share: ${formatMoney(baseShare)} per person`,
-        ""
-      ];
-
-      activeGroups.forEach((group) => {
-        const perPerson = baseShare + group.extraPerPerson;
-        const groupTotal = perPerson * group.count;
-        const meta = `Base + ${formatMoney(group.extraPerPerson)} extra per person (${group.percent}%)`;
-
-        renderResult(`${group.name} (${group.count})`, meta, perPerson, groupTotal);
-        summaryLines.push(`${group.name} (${group.percent}%): ${formatMoney(perPerson)} each`);
-      });
-
-      if (remainderPeople > 0) {
-        const groupTotal = baseShare * remainderPeople;
-        renderResult(`${remainderName} (${remainderPeople})`, "Standard share", baseShare, groupTotal);
-        summaryLines.push(`${remainderName}: ${formatMoney(baseShare)} each`);
+      function init() {
+        loadState();
+        syncFieldsFromState();
+        renderGroups();
+        updatePeoplePreview();
+        bindEvents();
       }
 
-      lastSummary = summaryLines.join("\n").trim();
-      setHidden(dom.results, false);
-      persistState();
-    }
-
-    async function copySummary() {
-      if (!lastSummary) {
-        showToast("Calculate first");
-        return;
-      }
-
-      try {
-        await navigator.clipboard.writeText(lastSummary);
-      } catch {
-        const textarea = document.createElement("textarea");
-        textarea.value = lastSummary;
-        textarea.setAttribute("readonly", "");
-        textarea.style.position = "fixed";
-        textarea.style.left = "-9999px";
-
-        document.body.append(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        textarea.remove();
-      }
-
-      showToast("Copied to clipboard");
-    }
-
-    function showToast(message) {
-      window.clearTimeout(toastTimer);
-      dom.toast.textContent = message;
-      dom.toast.classList.add("is-visible");
-
-      toastTimer = window.setTimeout(() => {
-        dom.toast.classList.remove("is-visible");
-      }, 1800);
-    }
-
-    function resetSavedData() {
-      try {
-        window.localStorage.removeItem(STORAGE_KEY);
-      } catch {
-        // Ignore storage errors.
-      }
-
-      lastSummary = "";
-      clearError();
-      setHidden(dom.results, true);
-      loadState();
-      showToast("Saved data reset");
-    }
-
-    dom.form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      calculateSplit();
-    });
-
-    dom.form.addEventListener("input", persistState);
-
-    dom.addGroupBtn.addEventListener("click", () => {
-      addGroup({ name: "", count: "1", percent: "0" }, true);
-    });
-
-    dom.groupsContainer.addEventListener("click", (event) => {
-      const removeButton = event.target.closest(".button--danger");
-      if (!removeButton) return;
-
-      const card = removeButton.closest(".group-card");
-      if (card) {
-        card.remove();
-        persistState();
-      }
-    });
-
-    dom.copyBtn.addEventListener("click", copySummary);
-    dom.resetBtn.addEventListener("click", resetSavedData);
-
-    loadState();
+      init();
+    })();
   </script>
 </body>
 </html>
